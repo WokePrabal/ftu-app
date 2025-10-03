@@ -4,7 +4,8 @@ import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
 import dbConnect from "../../lib/db";
-import Application from "../../models/Application";
+import Application from "../../lib/models/Application";
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

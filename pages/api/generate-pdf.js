@@ -1,5 +1,5 @@
 // pages/api/generate-pdf.js
-import { connectToDB } from '../../lib/db';
+import { dbConnect } from '../../lib/db';
 import Application from '../../lib/models/Application';
 import PDFDocument from 'pdfkit';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import axios from 'axios';
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   const { appId } = req.body;
-  await connectToDB();
+  await dbConnect();
   const app = await Application.findById(appId).lean();
   if (!app) return res.status(404).json({ error: 'not found' });
 

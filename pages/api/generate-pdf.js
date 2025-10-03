@@ -1,64 +1,42 @@
-import PDFDocument from "pdfkit";
-import Application from "@/lib/models/Application";
-import dbConnect from "@/lib/db";
+import jsPDF from "jspdf";
 
-export default async function handler(req, res) {
-  const { id } = req.query;
+export function generatePDF(app) {
+  const doc = new jsPDF();
 
-  await dbConnect();
+  doc.setFontSize(18);
+  doc.text("Application Submitted in FTU", 20, 20);
 
-  const app = await Application.findById(id);
-  if (!app) {
-    return res.status(404).json({ error: "Application not found" });
-  }
+  doc.setFontSize(12);
+  doc.text(`Full Name: ${app.fullname || ""}`, 20, 40);
+  doc.text(`Email: ${app.email || ""}`, 20, 50);
+  doc.text(`Stream: ${app.stream || app.selectedStream || ""}`, 20, 60);
+  doc.text(`Program: ${app.program || ""}`, 20, 70);
 
-  // create PDF
-  const doc = new PDFDocument();
-  let buffers = [];
-  doc.on("data", buffers.push.bind(buffers));
-  doc.on("end", () => {
-    let pdfData = Buffer.concat(buffers);
-    res.writeHead(200, {
-      "Content-Length": Buffer.byteLength(pdfData),
-      "Content-Type": "application/pdf",
-      "Content-Disposition": "attachment;filename=application.pdf",
-    }).end(pdfData);
-  });
-
-  // Heading
-  doc.fontSize(20).text("Your application is submitted in FTU", {
-    align: "center",
-  });
-  doc.moveDown();
-
-  // Details
-  doc.fontSize(14).text(`Full Name: ${app.fullname}`);
-  doc.text(`Email: ${app.email}`);
-  doc.text(`Stream: ${app.stream}`);
-  doc.text(`Program: ${app.program}`);
-  doc.text(`Status: ${app.status}`);
-  doc.moveDown();
-
-  // Photo (agar hai)
+  // Photo (thumbnail)
   if (app.photoUrl) {
     try {
-      doc.text("Photo:");
-      doc.image(app.photoUrl, {
-        fit: [100, 100],
-      });
-    } catch {
-      doc.text("(Photo could not be loaded)");
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.src = app.photoUrl;
+      img.onload = () => {
+        doc.addImage(img, "JPEG", 20, 80, 40, 40);
+      };
+    } catch (e) {
+      console.error("Error adding image:", e);
     }
-    doc.moveDown();
   }
 
-  // Document link
+  // Supporting Document link (opens in new tab)
   if (app.documentUrl) {
-    doc.text(`Supporting Document: ${app.documentUrl}`, {
-      link: app.documentUrl,
-      underline: true,
-    });
+    const linkText = "Open Supporting Document";
+    doc.setTextColor(0, 0, 255); // Blue
+    doc.text(linkText, 20, 140);
+
+    const textWidth = doc.getTextWidth(linkText);
+    // clickable area
+    doc.link(20, 135, textWidth, 10, { url: app.documentUrl });
+    doc.setTextColor(0, 0, 0); // Reset
   }
 
-  doc.end();
+  doc.save("FTU_Application.pdf");
 }

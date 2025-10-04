@@ -45,10 +45,8 @@ export default function ProgramClient() {
       setSelectedStream(streamVal);
       setPrograms(OPTIONS[streamVal] || []);
 
-      // prefill program if saved
       if (app.program) setSelectedProgram(app.program);
 
-      // save rest of progress states (not tied to program)
       setBaseProgress({
         personalDetails: !!app.fullname && !!app.email,
         upload: !!app.photoUrl && !!app.documentUrl,
@@ -78,7 +76,6 @@ export default function ProgramClient() {
     }
   };
 
-  // 🔑 Always recalc progress live from current selections
   const progress = {
     ...baseProgress,
     selectStream: !!selectedStream,
@@ -86,60 +83,76 @@ export default function ProgramClient() {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar progress={progress} />
-      <div className="p-6 flex-1">
-        <h1 className="text-2xl font-bold mb-4">Program of Study</h1>
+      <main className="flex-1 p-6 flex justify-center items-start">
+        {/* ✨ Content-sized card */}
+        <div className="w-full max-w-lg bg-white shadow rounded-lg p-6 inline-block">
+          <h1 className="text-2xl font-semibold mb-6">Program of Study</h1>
 
-        {/* Show stream as label if already chosen */}
-        {selectedStream ? (
-          <div className="mb-4">
-            <label className="block text-sm text-gray-600 mb-1">Selected stream</label>
-            <div className="p-2 border rounded bg-gray-50">
-              {STREAM_LABEL[selectedStream] || selectedStream}
+          {/* Stream */}
+          {selectedStream ? (
+            <div className="mb-6">
+              <label className="block text-sm text-gray-600 mb-1">
+                Selected Stream
+              </label>
+              <div className="p-3 border rounded bg-gray-100 font-medium">
+                {STREAM_LABEL[selectedStream] || selectedStream}
+              </div>
             </div>
+          ) : (
+            <div className="mb-6">
+              <label className="block text-sm text-gray-600 mb-1">
+                Choose Stream
+              </label>
+              <select
+                value={selectedStream}
+                onChange={(e) => {
+                  const s = e.target.value;
+                  setSelectedStream(s);
+                  setPrograms(OPTIONS[s] || []);
+                  setSelectedProgram("");
+                }}
+                className="border rounded-lg p-3 w-full bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              >
+                <option value="">-- Select stream --</option>
+                <option value="bachelors">Bachelor’s</option>
+                <option value="masters">Master’s</option>
+                <option value="phd">PhD</option>
+              </select>
+            </div>
+          )}
+
+          {/* Program */}
+          <div className="mb-6">
+            <label className="block text-sm text-gray-600 mb-1">Program</label>
+            <select
+              className="border rounded-lg p-3 w-full bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={selectedProgram}
+              onChange={(e) => setSelectedProgram(e.target.value)}
+              disabled={!selectedStream}
+            >
+              <option value="">-- Select a program --</option>
+              {programs.map((p, idx) => (
+                <option key={idx} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
           </div>
-        ) : (
-          <select
-            value={selectedStream}
-            onChange={(e) => {
-              const s = e.target.value;
-              setSelectedStream(s);
-              setPrograms(OPTIONS[s] || []);
-              setSelectedProgram(""); // reset program on stream change
-            }}
-            className="border rounded p-2 mb-4 w-full"
-          >
-            <option value="">-- Select stream --</option>
-            <option value="bachelors">Bachelor’s</option>
-            <option value="masters">Master’s</option>
-            <option value="phd">PhD</option>
-          </select>
-        )}
 
-        {/* Program dropdown */}
-        <select
-          className="border rounded p-2 mb-4 w-full"
-          value={selectedProgram}
-          onChange={(e) => setSelectedProgram(e.target.value)}
-          disabled={!selectedStream}
-        >
-          <option value="">-- Select a program --</option>
-          {programs.map((p, idx) => (
-            <option key={idx} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
-
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60"
-          onClick={handleNext}
-          disabled={loading}
-        >
-          {loading ? "Saving..." : "Continue"}
-        </button>
-      </div>
+          {/* Action */}
+          <div className="flex justify-end">
+            <button
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition disabled:opacity-60"
+              onClick={handleNext}
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Continue →"}
+            </button>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

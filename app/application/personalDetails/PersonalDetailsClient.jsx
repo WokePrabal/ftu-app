@@ -38,7 +38,12 @@ export default function PersonalDetailsClient() {
     }
     setLoading(true);
     try {
-      await saveOrUpdateApplication(id, { fullname: fullName, email }, router, "/application/upload");
+      await saveOrUpdateApplication(
+        id,
+        { fullname: fullName, email },
+        router,
+        "/application/upload"
+      );
     } catch (err) {
       console.error(err);
       alert("Failed to save");
@@ -48,36 +53,50 @@ export default function PersonalDetailsClient() {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar progress={progress} />
-      <div className="p-6 flex-1">
-        <h1 className="text-2xl font-bold mb-4">Personal Details</h1>
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Full Name</label>
-          <input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="border rounded p-2 w-full"
-          />
+
+      <main className="flex-1 p-6 flex justify-center items-start">
+        {/* ✨ Compact card only as big as content */}
+        <div className="w-full max-w-md bg-white shadow rounded-lg p-6">
+          <h1 className="text-2xl font-semibold mb-6">Personal Details</h1>
+
+          {/* Full Name */}
+          <div className="mb-5">
+            <label className="block text-sm text-gray-600 mb-2">Full Name</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="border rounded-lg p-3 w-full bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          {/* Email */}
+          <div className="mb-6">
+            <label className="block text-sm text-gray-600 mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="border rounded-lg p-3 w-full bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          {/* Action */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleSave}
+              disabled={loading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition disabled:opacity-60"
+            >
+              {loading ? "Saving..." : "Save & Continue →"}
+            </button>
+          </div>
         </div>
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border rounded p-2 w-full"
-          />
-        </div>
-        <button
-          onClick={handleSave}
-          disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg"
-        >
-          {loading ? "Saving..." : "Save & Continue"}
-        </button>
-      </div>
+      </main>
     </div>
   );
 }

@@ -6,9 +6,9 @@ import { useSearchParams } from "next/navigation";
 
 export default function Sidebar({ progress = {} }) {
   const searchParams = useSearchParams();
-  const id = searchParams?.get?.("id");
+  const queryId = searchParams?.get?.("id");
 
-  const withId = (path) => (id ? ${path}?id=${encodeURIComponent(id)} : path);
+  const withId = (path) => (queryId ? `${path}?id=${encodeURIComponent(queryId)}` : path);
 
   return (
     <div className="w-64 bg-gray-100 h-screen p-5">

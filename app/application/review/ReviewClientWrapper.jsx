@@ -275,7 +275,7 @@ export default function ReviewClientWrapper() {
                   <li key={field}>
                     
                       <span className="font-medium">{field}</span>
-                      <span className="ml-2 text-xs text-red-700"> — Click to edit</span>
+                     
                     
                   </li>
                 ))}

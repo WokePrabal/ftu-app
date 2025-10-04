@@ -6,7 +6,6 @@ import Sidebar from "@/components/Sidebar";
 import { fetchApplication } from "@/lib/applicationApi";
 import { API_BASE_URL } from "@/lib/config";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 export default function ReviewClientWrapper() {
   const router = useRouter();
